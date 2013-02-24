@@ -1,0 +1,79 @@
+#+TITLE:     Org Slides
+#+AUTHOR:    Rick Frankel
+#+OPTIONS:   H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:{} -:t f:t *:t <:t
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Overview
+This repository contains emacs lisp files providing HTML slideshow
+export and publishing options for the new org-mode export framework. 
+The latest org-mode is available for checkout at
+=git://orgmode.org/org-mode.git=, and includes these classes in the
+=contrib/lisp= directory (note that the versions included there may be
+older than those in this repository.)
+
+* The Exporters
+** ox-deck.el
+This will export/publish an org outline (or subtree) to a [[http://imakewebthings.com/deck.js/][deck.js]] slideshow.
+*** Installation
+1. Get a copy of [[http://imakewebthings.com/deck.js/][deck.js]] from [[http://imakewebthings.com/deck.js/]] or
+   the github repositiory at
+   [[https://github.com/imakewebthings/deck.js]].
+2. Customize the variable =org-deck-directories= to include the path
+   to the directory created in (1) above. This is required to
+   automatically identify available deck components (extensions,
+   themes and transitions).
+3. The exporter will create links to the themes, transitions and
+   extensions relative to the customization variable
+   =org-deck-base-url=.
+*** Customization
+ The method =org-deck-list-components=, will list all the available
+ extensions, themes and transitions in the directories included in
+ =org-deck-directories=.
+
+The following variables (in the customization group =org-export-deck=)
+are available to customize the slideshow generation:
+
+| customization variable      | in buffer option        | publishing option        | default   |
+|-----------------------------+-------------------------+--------------------------+-----------|
+| org-deck-base-url           | DECK_BASE_URL           | :deck-base-url           | deck.js   |
+| org-deck-theme              | DECK_THEME              | :deck-theme              | swiss.css |
+| org-deck-transition         | DECK_TRANSITION         | :deck-transition         | fade.css  |
+| org-deck-include-extensions | DECK_INCLUDE_EXTENSIONS | :deck-include-extensions | {all}     |
+| org-deck-exclude-extensions | DECK_EXCLUDE_EXTENSIONS | :deck-exclude-extensions |           |
+| org-deck-directories        | DECK_DIRECTORIES        | :deck-directories        |           |
+*** Using "builds"
+[[http://imakewebthings.com/deck.js/][deck.js]] creates "builds" through nested slides --- any block level
+element with the class "slide" will be treated as a build. The
+exporter has two ways to accomplish this:
+
+1. Set the =:HTML_CONTAINER_CLASS= property on a headline to a string
+   including =slide=.
+2. To build a list, set the =:STEP= property on the enclosing
+   headline to =t=.
+
+** ox-s5.el
+This will export/publish an org outline (or subtree) to an [[http://meyerweb.com/eric/tools/s5/][s5]]
+slideshow.
+*** Installation
+1. Get a copy of the [[http://meyerweb.com/eric/tools/s5/][s5]] scripts from
+   [[http://meyerweb.com/eric/tools/s5/]].
+2. 
+*** Customization
+The following variables (in the customization group =org-export-s5=)
+are available to customize the slideshow generation:
+
+| customization variable    | in buffer option      | publishing option      | default   |
+|---------------------------+-----------------------+------------------------+-----------|
+| org-s5-version            | S5_VERSION            | :s5-version            | 1.2a2     |
+| org-s5-theme-file         | S5_THEME_FILE         | :s5-theme-file         |           |
+| org-s5-ui-url             | S5_UI_URL             | :s5-ui-url             | ui        |
+| org-s5-default-view       | S5_DEFAULT_VIEW       | :s5-default-view       | slideshow |
+| org-s5-control-visibility | S5_CONTROL_VISIBILITY | :s5-control-visibility | hidden    |
+
+Note that if the =:s5-theme-file= is =nil=, it will use the file
+=default/screen.css= relative to =:s5-ui-url=.
+*** Using "builds"
+ [[http://meyerweb.com/eric/tools/s5/][s5]] creates "builds" by including the class =incremental= on a
+ list (=ul= or =ol=). The exporter will apply this class to any list
+ whose parent headline has the property =:INCREMENTAL=
