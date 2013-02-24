@@ -40,7 +40,7 @@
 
 (org-export-define-derived-backend deck html
   :menu-entry
-  (?s "Export to deck.js HTML Presentation"
+  (?d "Export to deck.js HTML Presentation"
       ((?H "To temporary buffer" org-deck-export-as-html)
        (?h "To file" org-deck-export-to-html)
        (?o "To file and open"
@@ -253,7 +253,7 @@ Note that the wrapper div must include the class \"slide\"."
    (org-html-toc-text
     (mapcar
      (lambda (headline)
-       (let* ((class (org-element-property :html-container-class headline))
+       (let* ((class (org-element-property :HTML_CONTAINER_CLASS headline))
               (section-number
                (when
                    (and (not (org-export-low-level-p headline info))
@@ -332,19 +332,13 @@ holding export options."
    "\n"))
 
 (defun org-deck-headline (headline contents info)
-  (let* ((org-html-toplevel-hlevel 2)
-         (container-class (org-element-property :HTML_CONTAINER_CLASS headline))
-         (class
-          (cond
-           ((and (not (eq nil container-class))
-                 (string-match-p "\\<slide\\>" container-class))
-            container-class)
-           ((= 1 (+ (org-element-property :level headline)
-                    (plist-get info :headline-offset)))
-            (mapconcat 'identity
-                       (list container-class "slide") " ")))))
-    (when class (org-element-put-property headline :html-container-class class))
-    (org-html-headline headline contents info)))
+  (let ((org-html-toplevel-hlevel 2)
+        (class (or (org-element-property :HTML_CONTAINER_CLASS headline) ""))
+        (level (+ (org-element-property :level headline)
+                   (plist-get info :headline-offset))))
+    (when (and (= 1 level) (not (string-match-p "\\<slide\\>" class)))
+      (org-element-put-property headline :HTML_CONTAINER_CLASS (concat class " slide")))
+  (org-html-headline headline contents info)))
 
 (defun org-deck-item (item contents info)
   "Transcode an ITEM element from Org to HTML.

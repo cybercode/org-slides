@@ -206,18 +206,13 @@ Note that the wrapper div must include the class \"slide\"."
            (plist-get info :s5-control-visibility))))
 
 (defun org-s5-headline (headline contents info)
-  (let ((org-html-toplevel-hlevel 1))
-    (org-html-headline
-     (if (= 1 (+ (org-element-property :level headline)
-		 (plist-get info :headline-offset)))
-         (org-element-put-property
-	  headline :html-container-class
-	  (mapconcat 'identity
-		     (list
-		      (org-element-property
-		       :HTML_CONTAINER_CLASS headline)
-		      "slide") " "))
-	  headline) contents info)))
+  (let ((org-html-toplevel-hlevel 1)
+        (class (or (org-element-property :HTML_CONTAINER_CLASS headline) ""))
+        (level (+ (org-element-property :level headline)
+                  (plist-get info :headline-offset))))
+    (when (and (= 1 level) (not (string-match-p "\\<slide\\>" class)))
+      (org-element-put-property headline :HTML_CONTAINER_CLASS (concat class " slide")))
+    (org-html-headline headline contents info)))
 
 (defun org-s5-plain-list (plain-list contents info)
   "Transcode a PLAIN-LIST element from Org to HTML.
