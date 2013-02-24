@@ -37,7 +37,7 @@
 ;; Follow the general instructions at the above website. To generate
 ;; incremental builds, you can set the HTML_CONTAINER_CLASS on an
 ;; object to "incremental" to make it build. If you want an outline to
-;; build, set the` INCREMENTAL property on the parent headline.
+;; build, set the :INCREMENTAL property on the parent headline.
 
 ;; To test it, run:
 ;;
@@ -68,7 +68,9 @@
    (:html-style-include-scripts "HTML_INCLUDE_SCRIPTS" nil nil)
    (:s5-version "S5_VERSION" nil org-s5-version)
    (:s5-theme-file "S5_THEME_FILE" nil org-s5-theme-file)
-   (:s5-ui-url "S5_UI_URL" nil org-s5-ui-url))
+   (:s5-ui-url "S5_UI_URL" nil org-s5-ui-url)
+   (:s5-default-view "S5_DEFAULT_VIEW" nil org-s5-default-view)
+   (:s5-control-visibility "S5_CONTROL_VISIBILITY" nil org-s5-control-visibility))
   :translate-alist
   ((headline . org-s5-headline)
    (plain-list . org-s5-plain-list)
@@ -196,10 +198,12 @@ Note that the wrapper div must include the class \"slide\"."
 (defun org-s5--build-meta-info (info)
   (concat
    (org-html--build-meta-info info)
-   (format "<meta name=\"version\" content=\"S5 %s\" />"
+   (format "<meta name=\"version\" content=\"S5 %s\" />\n"
 	   (plist-get info :s5-version))
-   "<meta name='defaultView' content='slideshow' />\n"
-   "<meta name='controlVis' content='hidden' />"))
+   (format "<meta name='defaultView' content='%s' />\n"
+           (plist-get info :s5-default-view))
+   (format "<meta name='controlVis' content='%s' />"
+           (plist-get info :s5-control-visibility))))
 
 (defun org-s5-headline (headline contents info)
   (let ((org-html-toplevel-hlevel 1))
@@ -211,7 +215,7 @@ Note that the wrapper div must include the class \"slide\"."
 	  (mapconcat 'identity
 		     (list
 		      (org-element-property
-		       :html-container-class headline)
+		       :HTML_CONTAINER_CLASS headline)
 		      "slide") " "))
 	  headline) contents info)))
 
@@ -219,7 +223,7 @@ Note that the wrapper div must include the class \"slide\"."
   "Transcode a PLAIN-LIST element from Org to HTML.
 CONTENTS is the contents of the list.  INFO is a plist holding
 contextual information.
-If a containing headline has the property :incremental,
+If a containing headline has the property :INCREMENTAL,
 then the \"incremental\" class will be added to the to the list,
 which will make the list into a \"build\"."
   (let* ((type (org-element-property :type plain-list))
@@ -230,7 +234,7 @@ which will make the list into a \"build\"."
     (format "%s\n%s%s"
 	    (format
 	     "<%s class='org-%s%s'>" tag tag
-	     (if (org-export-get-node-property :incremental plain-list t)
+	     (if (org-export-get-node-property :INCREMENTAL plain-list t)
 		 " incremental" ""))
 	    contents (org-html-end-plain-list type))))
 
@@ -239,7 +243,7 @@ which will make the list into a \"build\"."
    ("title"  . ,(car (plist-get info :title)))
    ("author" . ,(car (plist-get info :author)))
    ("email"  . ,(plist-get info :email))
-   ("date"   . ,(substring (nth 0 (plist-get info :date)) 0 10))
+   ("date"   . ,(nth 0 (plist-get info :date)))
    ("file"   . ,(plist-get info :input-file))))
 
 (defun org-s5-template (contents info)

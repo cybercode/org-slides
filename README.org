@@ -75,5 +75,7 @@ Note that if the =:s5-theme-file= is =nil=, it will use the file
 =default/screen.css= relative to =:s5-ui-url=.
 *** Using "builds"
  [[http://meyerweb.com/eric/tools/s5/][s5]] creates "builds" by including the class =incremental= on a
- list (=ul= or =ol=). The exporter will apply this class to any list
- whose parent headline has the property =:INCREMENTAL=
+ headline or list (=ul= or =ol=). You can set the
+ =HTML_CONTAINER_CLASS= property on a headline to "incremental",  to
+ make it build. To make a list build, set the =INCREMENTAL= property
+ on the parent headline to =t=.
