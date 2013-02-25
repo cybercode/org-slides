@@ -337,7 +337,7 @@ holding export options."
         (level (org-export-get-relative-level headline info)))
     (when (and (= 1 level) (not (string-match-p "\\<slide\\>" class)))
       (org-element-put-property headline :HTML_CONTAINER_CLASS (concat class " slide")))
-  (org-html-headline headline contents info)))
+    (org-html-headline headline contents info)))
 
 (defun org-deck-item (item contents info)
   "Transcode an ITEM element from Org to HTML.
