@@ -1,8 +1,5 @@
-#+TITLE:     Org Slides
 #+AUTHOR:    Rick Frankel
 #+OPTIONS:   H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:{} -:t f:t *:t <:t
-#+EXPORT_SELECT_TAGS: export
-#+EXPORT_EXCLUDE_TAGS: noexport
 
 * Overview
 This repository contains emacs lisp files providing HTML slideshow
