@@ -153,7 +153,7 @@ Note that the wrapper div must include the class \"slide\"."
 
 (defun org-s5--format-toc-headline (headline info)
   "Return an appropriate table of contents entry for HEADLINE.
-Note that (currently) the S5 exporter does not support deep links, 
+Note that (currently) the S5 exporter does not support deep links,
 so the table of contents is not \"active\".
 INFO is a plist used as a communication channel."
   (let* ((headline-number (org-export-get-headline-number headline info))
@@ -185,7 +185,7 @@ INFO is a plist used as a communication channel."
        "</div>\n"
        "</div>\n"))))
 
-(defun org-s5--build-style (info)
+(defun org-s5--build-head (info)
   (let* ((dir (plist-get info :s5-ui-url))
 	 (theme (or (plist-get info :s5-theme-file) "default/slides.css")))
     (mapconcat

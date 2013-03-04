@@ -280,7 +280,7 @@ Note that the wrapper div must include the class \"slide\"."
             title)
           (org-export-get-relative-level headline info))))
      (org-export-collect-headlines info depth)))
-   "</div>\n" ))
+   "</div>\n"))
 
 (defun org-deck--get-packages (info)
   (let ((prefix (concat (plist-get info :deck-base-url) "/"))
@@ -397,7 +397,7 @@ holding export options."
       "<script type='text/javascript'>"
       "  $(document).ready(function () { $.deck('.slide'); });"
       "</script>"
-      (org-html--build-style info)
+      (org-html--build-head info)
       org-deck-title-page-style
       "</head>"
       "<body>"
