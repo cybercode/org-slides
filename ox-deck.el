@@ -51,7 +51,6 @@
   :options-alist
   ((:html-link-home "HTML_LINK_HOME" nil nil)
    (:html-link-up "HTML_LINK_UP" nil nil)
-   (:html-mathjax "HTML_MATHJAX" nil "" space)
    (:html-postamble nil "html-postamble" nil t)
    (:html-preamble nil "html-preamble" nil t)
    (:html-head-include-default-style "HTML_INCLUDE_DEFAULT_STYLE" nil nil)
