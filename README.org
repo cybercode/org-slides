@@ -78,3 +78,9 @@ Note that if the =:s5-theme-file= is =nil=, it will use the file
  =HTML_CONTAINER_CLASS= property on a headline to "incremental",  to
  make it build. To make a list build, set the =INCREMENTAL= property
  on the parent headline to =t=.
+
+* deck.js extension
+onepage is a [[http://imakewebthings.com/deck.js/][deck.js]] exension which, logically, will display a deck.js
+slideshow as a single scrolling page. It can be toggled with the 'o'
+key, and will print with slides separated by rule instead of one
+slide per page.
