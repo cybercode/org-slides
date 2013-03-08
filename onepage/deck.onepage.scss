@@ -1,0 +1,49 @@
+.deck-onepage {
+	width:100% !important;
+	height:auto !important;
+	padding:0 !important;
+	display:block !important;
+
+    .slide {
+	    position:static !important;
+	    visibility:visible !important;
+	    display:block !important;
+	    -webkit-transform:none !important;
+	    -moz-transform:none !important;
+	    -o-transform:none !important;
+	    -ms-transform:none !important;
+	    transform:none !important;
+	    opacity:1 !important;
+
+	    border-bottom: 1px dotted grey;
+	    padding-bottom: 2em;
+    }
+    h1, .vcenter {
+	    -webkit-transform:none !important;
+	    -moz-transform:none !important;
+	    -o-transform:none !important;
+	    -ms-transform:none !important;
+	    transform:none !important;
+	    padding:0 !important;
+	    position:static !important;
+    }
+    h1 {
+	    text-align: center;
+	    margin-top: 0 !important;
+        margin-bottom: 0;
+    }
+    form, .deck-status, .deck-permalink, .deck-toc-status {
+	    display: none;
+    }
+    pre {
+	    padding: 1em 2em;
+	    margin-left: 2em;
+	    margin-right: 2em;
+	    border-left: 2px solid grey;
+    }
+    @media print {
+        .deck-container > .slide {
+            page-break-after: auto; // override one slide per page
+        }
+    }
+}
