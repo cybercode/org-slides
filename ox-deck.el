@@ -169,22 +169,24 @@ Can be overriden with the DECK_BASE_URL property."
   "Format template to specify footer div.
 Completed using `org-fill-template'.
 Optional keys include %author, %email, %file, %title and %date.
-This is included in a <footer> section."
+This is included in the postamble section (see `org-html-divs'),
+with the additional css class \"deck-org-status\"."
   :group 'org-export-deck
   :type 'string)
 
 (defcustom org-deck-header-template ""
   "Format template to specify page. Completed using `org-fill-template'.
 Optional keys include %author, %email, %file, %title and %date.
-This is included in a <header> section."
+This is included in the preamble section (see `org-html-divs'),
+with the additional css classes \"deck-org-status\" and \"deck-header\"."
   :group 'org-export-deck
   :type 'string)
 
-(defcustom org-deck-title-page-style
+(defcustom org-deck-style
   "<style type='text/css'>
-    header, footer { left: 5px; width: 100% }
-    header { position: absolute; top: 10px; }
-    #title-slide h1 {
+    .deck-org-status { left: 5px; width: 100% }
+    .deck-header { position: absolute; top: 10px; }
+    #title-slide h1, #table-of-contents h1 {
         position: static; padding: 0;
         margin-top: 10%;
         -webkit-transform: none;
@@ -200,7 +202,9 @@ This is included in a <header> section."
         margin: 0;
     }
 </style>"
-  "CSS styles to use for title page"
+  "Additional CSS styles to use for org specific deck.js features.
+The default includes css specifications for the header, footer
+and title page sections of the generated html."
   :group 'org-export-deck
   :type 'string)
 
@@ -215,30 +219,6 @@ This is included in a <header> section."
 Completed using `org-fill-template'.
 Optional keys include %author, %email, %file, %title and %date.
 Note that the wrapper div must include the class \"slide\"."
-  :group 'org-export-deck
-  :type 'string)
-
-(defcustom org-deck-toc-style
-  "<style type='text/css'>
-    header, footer { left: 5px; width: 100% }
-    header { position: absolute; top: 10px; }
-    #table-of-contents h1 {
-        position: static; padding: 0;
-        margin-top: 10%;
-        -webkit-transform: none;
-        -moz-transform: none;
-        -ms-transform: none;
-        -o-transform: none;
-        Transform: none;
-    }
-    #title-slide h2 {
-        text-align: center;
-        border:none;
-        padding: 0;
-        margin: 0;
-    }
-</style>"
-  "CSS styles to use for title page"
   :group 'org-export-deck
   :type 'string)
 
@@ -360,7 +340,7 @@ holding export options."
     (mapconcat
      'identity
      (list
-      "<!DOCTYPE html>"
+      (plist-get info :html-doctype)
       (let ((lang (plist-get info :language)))
         (mapconcat
          (lambda (x)
@@ -396,14 +376,18 @@ holding export options."
       "  $(document).ready(function () { $.deck('.slide'); });"
       "</script>"
       (org-html--build-head info)
-      org-deck-title-page-style
+      org-deck-style
       "</head>"
       "<body>"
-      "<header class='deck-status'>"
+      (format "<%s class='%s deck-org-status deck-header'>"
+	      (nth 1 (assq 'preamble org-html-divs))
+	      (nth 2 (assq 'preamble org-html-divs)))
       (org-fill-template
        org-deck-header-template (org-deck-template-alist info))
-      "</header>"
-      "<div class='deck-container'>"
+      (format "</%s>" (nth 1 (assq 'preamble org-html-divs)))
+      (format "<%s class='b%s deck-container'>"
+	      (nth 1 (assq 'content org-html-divs))
+	      (nth 2 (assq 'content org-html-divs)))
       ;; title page
       (org-fill-template
        org-deck-title-page-template (org-deck-template-alist info))
@@ -416,11 +400,13 @@ holding export options."
          (with-temp-buffer (insert-file-contents snippet)
                            (buffer-string)))
        (plist-get pkg-info :snippets) "\n")
-      "<footer class='deck-status'>"
+      (format "<footer class='%s deck-org-status'>"
+	      (nth 1 (assq 'postamble org-html-divs))
+	      (nth 2 (assq 'postamble org-html-divs)))
       (org-fill-template
        org-deck-footer-template (org-deck-template-alist info))
-      "</footer>"
-      "</div>"
+      (format "</footer>" (nth 1 (assq 'postamble  org-html-divs)))
+      (format "</%s>" (nth 1 (assq 'content  org-html-divs)))
       "</body>"
       "</html>\n") "\n")))
 
