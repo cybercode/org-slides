@@ -54,11 +54,11 @@ documents. The "standard" for [[http://imakewebthings.com/deck.js/][deck.js]] is
 the org exporter will allow you to modify the output as follows. By
 modifying  the following options/variable:
 
-| option                     | in buffer option | publishing option | value                                                                                       |
-|----------------------------+------------------+-------------------+---------------------------------------------------------------------------------------------|
-| org-html-container-element | HTML_CONTAINER   | :html-container   | section                                                                                     |
-| org-html-doctype           | HTML_DOCTYPE     | :html-doctype     | <!DOCTYPE html>                                                                             |
-| org-html-divs              |                  |                   | preamble "header" "preamble") (content "article" "content") (postamble "footer" "postamble) |
+| option                     | in buffer option | publishing option | value                                                                                          |
+|----------------------------+------------------+-------------------+------------------------------------------------------------------------------------------------|
+| org-html-container-element | HTML_CONTAINER   | :html-container   | section                                                                                        |
+| org-html-doctype           | HTML_DOCTYPE     | :html-doctype     | <!DOCTYPE html>                                                                                |
+| org-html-divs              |                  |                   | ((preamble "header" "preamble") (content "article" "content") (postamble "footer" "postamble)) |
 
 Note that =org-html-divs= cannot be set with a customization or
 in-buffer option, but must be set with a BIND or local variable.
