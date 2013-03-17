@@ -95,7 +95,7 @@ Note that if the =:s5-theme-file= is =nil=, it will use the file
 XOXO style slideshows (see [[http://meyerweb.com/eric/tools/s5/xoxo-structure-ref.html][S5 (XOXO Version)]]) can be generated
 by setting the =org-html-container-element= to =li=. This can be done
 in a number of ways as show in the table above under
-[[Generating HTML5 compatible slideshows]].
+[[#generating-html5-compatible-slideshows][Generating HTML5 compatible slideshows]].
 * deck.js extension
 onepage is a [[http://imakewebthings.com/deck.js/][deck.js]] exension which, logically, will display a deck.js
 slideshow as a single scrolling page. It can be toggled with the 'o'
