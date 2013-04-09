@@ -3,12 +3,10 @@
 
 * Overview
 This repository contains emacs lisp files providing HTML slideshow
-export and publishing options for the new org-mode export framework. 
-The latest org-mode is available for checkout at
+export and publishing options for the new org-mode version 8 export
+framework.  The latest org-mode is available for checkout at
 =git://orgmode.org/org-mode.git=, and includes these classes in the
-=contrib/lisp= directory (note that the versions included there may be
-older than those in this repository.)
-
+=contrib/lisp= directory.
 * The Exporters
 ** ox-deck.el
 This will export/publish an org outline (or subtree) to a [[http://imakewebthings.com/deck.js/][deck.js]] slideshow.

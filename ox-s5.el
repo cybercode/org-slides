@@ -5,6 +5,8 @@
 ;; Author: Rick Frankel <emacs at rickster dot com>
 ;; Keywords: outlines, hypermedia, S5, wp
 
+;; This file is not part of GNU Emacs.
+
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
@@ -48,32 +50,33 @@
 
 (require 'ox-html)
 
-(org-export-define-derived-backend s5 html
+(org-export-define-derived-backend 's5 'html
   :menu-entry
-  (?s "Export to S5 HTML Presentation"
-      ((?H "To temporary buffer" org-s5-export-as-html)
-       (?h "To file" org-s5-export-to-html)
-       (?o "To file and open"
-           (lambda (a s v b)
-             (if a (org-s5-export-to-html t s v b)
-               (org-open-file (org-s5-export-to-html nil s v b)))))))
+  '(?s "Export to S5 HTML Presentation"
+       ((?H "To temporary buffer" org-s5-export-as-html)
+	(?h "To file" org-s5-export-to-html)
+	(?o "To file and open"
+	    (lambda (a s v b)
+	      (if a (org-s5-export-to-html t s v b)
+		(org-open-file (org-s5-export-to-html nil s v b)))))))
   :options-alist
-  ((:html-link-home "HTML_LINK_HOME" nil nil)
-   (:html-link-up "HTML_LINK_UP" nil nil)
-   (:html-postamble nil "html-postamble" nil t)
-   (:html-preamble nil "html-preamble" nil t)
-   (:html-head-include-default-style "HTML_INCLUDE_DEFAULT_STYLE" nil nil)
-   (:html-head-include-scripts "HTML_INCLUDE_SCRIPTS" nil nil)
-   (:s5-version "S5_VERSION" nil org-s5-version)
-   (:s5-theme-file "S5_THEME_FILE" nil org-s5-theme-file)
-   (:s5-ui-url "S5_UI_URL" nil org-s5-ui-url)
-   (:s5-default-view "S5_DEFAULT_VIEW" nil org-s5-default-view)
-   (:s5-control-visibility "S5_CONTROL_VISIBILITY" nil org-s5-control-visibility))
+  '((:html-link-home "HTML_LINK_HOME" nil nil)
+    (:html-link-up "HTML_LINK_UP" nil nil)
+    (:s5-postamble "S5_POSTAMBLE" nil org-s5-postamble newline)
+    (:s5-preamble "S5_PREAMBLE" nil org-s5-preamble newline)
+    (:html-head-include-default-style "HTML_INCLUDE_DEFAULT_STYLE" nil nil)
+    (:html-head-include-scripts "HTML_INCLUDE_SCRIPTS" nil nil)
+    (:s5-version "S5_VERSION" nil org-s5-version)
+    (:s5-theme-file "S5_THEME_FILE" nil org-s5-theme-file)
+    (:s5-ui-url "S5_UI_URL" nil org-s5-ui-url)
+    (:s5-default-view "S5_DEFAULT_VIEW" nil org-s5-default-view)
+    (:s5-control-visibility "S5_CONTROL_VISIBILITY" nil
+			    org-s5-control-visibility))
   :translate-alist
-  ((headline . org-s5-headline)
-   (plain-list . org-s5-plain-list)
-   (inner-template . org-s5-inner-template)
-   (template . org-s5-template)))
+  '((headline . org-s5-headline)
+    (plain-list . org-s5-plain-list)
+    (inner-template . org-s5-inner-template)
+    (template . org-s5-template)))
 
 (defgroup org-export-s5 nil
   "Options for exporting Org mode files to S5 HTML Presentations."
@@ -115,33 +118,67 @@ Can be overriden with the S5_UI_URL property."
   :group 'org-export-s5
   :type '(choice (const hidden) (const visibile)))
 
-(defcustom org-s5-footer-template
-  "<h1>%author - %title</h1>"
-  "Format template to specify footer div.
-Completed using `org-fill-template', optional keys include
-%author, %email, %file, %title and %date.
+(defvar org-s5--divs
+  '((preamble  "div" "header")
+    (content   "div" "content")
+    (postamble "div" "footer"))
+  "Alist of the three section elements for HTML export.
+The car of each entry is one of 'preamble, 'content or 'postamble.
+The cdrs of each entry are the ELEMENT_TYPE and ID for each
+section of the exported document.
 
-It will be wrapped in a <div> with the id \"footer\""
+If you set `org-html-container-element' to \"li\", \"ol\" will be
+uses as the content ELEMENT_TYPE, generating an XOXO format
+slideshow.
+
+Note that changing the preamble or postamble will break the
+core S5 stylesheets.")
+
+(defcustom org-s5-postamble "<h1>%a - %t</h1>"
+  "Preamble inserted into the S5 layout section.
+When set to a string, use this string as the postamble.
+
+When set to a function, apply this function and insert the
+returned string.  The function takes the property list of export
+options as its only argument.
+
+Setting the S5_POSTAMBLE option -- or the :s5-postamble in publishing
+projects -- will take precedence over this variable.
+
+Note that the default css styling will break if this is set to nil
+or an empty string."
   :group 'org-export-s5
-  :type 'string)
+  :type '(choice (const :tag "No postamble" "&#x20;")
+		 (string :tag "Custom formatting string")
+		 (function :tag "Function (must return a string)")))
 
-(defcustom org-s5-header-template ""
-  "Format template to specify header div.
-Completed using `org-fill-template', optional keys include
-%author, %email, %file, %title and %date.
+(defcustom org-s5-preamble "&#x20;"
+  "Peamble inserted into the S5 layout section.
 
-It will be wrapped in a <div> with the id \"header\""
+When set to a string, use this string as the preamble.
+
+When set to a function, apply this function and insert the
+returned string.  The function takes the property list of export
+options as its only argument.
+
+Setting S5_PREAMBLE option -- or the :s5-preamble in publishing
+projects -- will take precedence over this variable.
+
+Note that the default css styling will break if this is set to nil
+or an empty string."
   :group 'org-export-s5
-  :type 'string)
+  :type '(choice (const :tag "No preamble" "&#x20;")
+		 (string :tag "Custom formatting string")
+		 (function :tag "Function (must return a string)")))
 
 (defcustom org-s5-title-slide-template
-  "<h1>%title</h1>
-<h2>%author</h2>
-<h2>%email</h2>
-<h2>%date</h2>"
+  "<h1>%t</h1>
+<h2>%a</h2>
+<h2>%e</h2>
+<h2>%d</h2>"
   "Format template to specify title page section.
-Completed using `org-fill-template', optional keys include
-%author, %email, %file, %title and %date.
+See `org-html-postamble-format' for the valid elements which
+can be included.
 
 It will be wrapped in the element defined in the :html-container
 property, and defaults to the value of `org-html-container-element',
@@ -249,14 +286,6 @@ which will make the list into a \"build\"."
                  " incremental" ""))
             contents (org-html-end-plain-list type))))
 
-(defun org-s5-template-alist (info)
-  `(
-   ("title"  . ,(car (plist-get info :title)))
-   ("author" . ,(car (plist-get info :author)))
-   ("email"  . ,(plist-get info :email))
-   ("date"   . ,(nth 0 (plist-get info :date)))
-   ("file"   . ,(plist-get info :input-file))))
-
 (defun org-s5-inner-template (contents info)
   "Return body of document string after HTML conversion.
 CONTENTS is the transcoded contents string.  INFO is a plist
@@ -267,47 +296,47 @@ holding export options."
   "Return complete document string after HTML conversion.
 CONTENTS is the transcoded contents string.  INFO is a plist
 holding export options."
-  (mapconcat
-   'identity
-   (list
-    (plist-get info :html-doctype)
-    (format "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"%s\" xml:lang=\"%s\">"
-            (plist-get info :language) (plist-get info :language))
-    "<head>"
-    (org-s5--build-meta-info info)
-    (org-s5--build-head info)
-    (org-html--build-head info)
-    (org-html--build-mathjax-config info)
-    "</head>"
-    "<body>"
-    "<div class=\"layout\">"
-    "<div id=\"controls\"><!-- no edit --></div>"
-    "<div id=\"currentSlide\"><!-- no edit --></div>"
-     "<div id='header'>"
-    (org-fill-template
-     org-s5-header-template (org-s5-template-alist info))
-    "</div>"
-    "<div id='footer'>"
-    (org-fill-template
-     org-s5-footer-template (org-s5-template-alist info))
-    "</div>"
-    "</div>"
-    (format "<%s id=\"%s\" class=\"presentation\">"
-            (nth 1 (assq 'content org-html-divs))
-            (nth 2 (assq 'content org-html-divs)))
-    ;; title page
-    (format "<%s id='title-slide' class='slide'>"
-            (plist-get info :html-container))
-    (org-fill-template
-     org-s5-title-slide-template (org-s5-template-alist info))
-    (format "</%s>" (plist-get info :html-container))
-    ;; table of contents.
-    (let ((depth (plist-get info :with-toc)))
-      (when depth (org-s5-toc depth info)))
-    contents
-    (format "</%s>" (nth 1 (assq 'content org-html-divs)))
-    "</body>"
-    "</html>\n") "\n"))
+  (let ((org-html-divs
+	 (if (equal (plist-get info :html-container) "li")
+	     (append '((content "ol" "content")) org-s5--divs)
+	   org-s5--divs))
+	 (info (plist-put
+		(plist-put info :html-preamble (plist-get info :s5-preamble))
+		:html-postamble (plist-get info :s5-postamble))))
+    (mapconcat
+     'identity
+     (list
+      (plist-get info :html-doctype)
+      (format "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"%s\" xml:lang=\"%s\">"
+	      (plist-get info :language) (plist-get info :language))
+      "<head>"
+      (org-s5--build-meta-info info)
+      (org-s5--build-head info)
+      (org-html--build-head info)
+      (org-html--build-mathjax-config info)
+      "</head>"
+      "<body>"
+      "<div class=\"layout\">"
+      "<div id=\"controls\"><!-- no edit --></div>"
+      "<div id=\"currentSlide\"><!-- no edit --></div>"
+      (org-html--build-pre/postamble 'preamble info)
+      (org-html--build-pre/postamble 'postamble info)
+      "</div>"
+      (format "<%s id=\"%s\" class=\"presentation\">"
+	      (nth 1 (assq 'content org-html-divs))
+	      (nth 2 (assq 'content org-html-divs)))
+      ;; title page
+      (format "<%s id='title-slide' class='slide'>"
+	      (plist-get info :html-container))
+      (format-spec org-s5-title-slide-template (org-html-format-spec info))
+      (format "</%s>" (plist-get info :html-container))
+      ;; table of contents.
+      (let ((depth (plist-get info :with-toc)))
+	(when depth (org-s5-toc depth info)))
+      contents
+      (format "</%s>" (nth 1 (assq 'content org-html-divs)))
+      "</body>"
+      "</html>\n") "\n")))
 
 (defun org-s5-export-as-html
   (&optional async subtreep visible-only body-only ext-plist)
@@ -412,3 +441,5 @@ Return output file name."
   (org-publish-org-to 's5 filename ".html" plist pub-dir))
 
 (provide 'ox-s5)
+
+;;; ox-s5.el ends here
